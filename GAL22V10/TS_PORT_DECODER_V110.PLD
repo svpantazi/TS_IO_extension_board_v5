@@ -1,0 +1,92 @@
+Name     TS_PORT_DECODER_v110;
+PartNo   01 ;
+Date     24/07/2024 ;
+Revision 10 ;
+Designer Stefan V. Pantazi ;
+Company  home ;
+Assembly None ;
+Location Canada ;
+Device   G22V10;
+
+
+/*modified Jul 2024*/	
+
+/* *************** INPUT PINS *********************/
+PIN  1   = !M1_delay; /* delayed M1 from F1.1 (LS74) */ 
+PIN  2   = A14; /*                           */ 
+PIN  3   = A7; /*                                 */ 
+PIN  4   = A6; /*                                 */ 
+PIN  5   = A5; /*                                 */ 
+PIN  6   = A4; /*                                 */ 
+PIN  7   = A3; 	/*                                 */ 
+PIN  8   = A2;	 /*                                 */ 
+PIN  9   = A1; 	/*                                 */ 
+PIN  10   = A0; 	/*                                 */ 
+PIN  11   = !IORD; 	/*                   */ 
+PIN  13   = !IOWR;	/*                   */ 
+PIN  14   = A15;	/*                   */ 
+
+/* *************** OUTPUT PINS *********************/
+/*AY*/	
+PIN  15   = AY_SWITCH; 	  
+PIN  16   =  BC1;
+PIN  17   =  BDIR;
+
+/* decoding */	
+PIN  18   =  !decode_feh; 
+PIN  19   =  !SIO_CE; /* changed to SIO CE; */	
+
+/* CF card */	
+PIN  20   =  !CF_CS1; /* second CF card selection */
+PIN  21   =  !CF_CS0; /* first CF card selection */
+PIN  22   =  !CF_IORD;
+PIN  23   =  !CF_IOWR;
+
+/* *************** INTERMEDIATE VARs  *********************/
+!decode_feh	  =  A0 # !A1 # !A2 # !A3 # !A4 # !A5 # !A6 # !A7;
+
+!decode_84h_87h 	     =  !A2 #  A3 #  A4 #  A5 #  A6 # !A7;
+!decode_10h_17h 	           =   A3 # !A4 #  A5 #  A6 #  A7;
+!decode_20h_27h 	           =   A3 #  A4 # !A5 #  A6 #  A7;
+
+/* CF card */	
+!CF_CS0=!(decode_10h_17h & !M1_delay); 
+!CF_CS1=!(decode_20h_27h & !M1_delay);
+
+!CF_IOWR=(!decode_10h_17h & !decode_20h_27h) # !IOWR;
+!CF_IORD=(!decode_10h_17h & !decode_20h_27h) # !IORD;
+
+/* *************** EQUATIONS VARs  *********************/
+
+/* AY IO */
+/* a0h-a3h MSX1-style AY-3 decoding: A0=register write, A1=value data write, A2=value data read*/
+/*fffdh-bffdh ZX Spectrum-style AY-3 decoding: bffdh=register write, fffdh=value data write, ffffh=value data read */
+ay3_msx_decode=              !A2 & !A3 & !A4 &  A5 & !A6 & A7;
+ay3_zx_decode=    A0       &  A2 &  A3 &  A4 &  A5 &  A6 & A7       & A15;
+
+
+REG_MSX_OUT   = ay3_msx_decode & !A0 & !A1 & IOWR; /*output on REG A0 port*/	
+DATA_MSX_OUT  = ay3_msx_decode &  A0 & !A1 & IOWR; /*output on DATA A1 port*/
+DATA_MSX_IN   = ay3_msx_decode & !A0 &  A1 & IORD; /*input on DATA A2 port*/
+AY_MSX_SWITCH = ay3_msx_decode &  A0 &  A1 & IOWR; /*PSG select: A3 port, bit 0*/
+
+REG_SEL_ZX_OUT  = ay3_zx_decode & !A1 &  A14 & IOWR; /*output on DATA FFFDh port*/
+REG_VAL_ZX_OUT   = ay3_zx_decode & !A1 & !A14 & IOWR; /*output on REG BFFDh port*/	
+REG_VAL_ZX_IN   = ay3_zx_decode & !A1 &  A14 & IORD; /*input on DATA FFFDh port*/
+AY_ZX_SWITCH = ay3_zx_decode &  A1 &  A14 & IOWR; /*output on FFFFh port, PSG select, bit 0; depends on the value of register B being $FF*/
+
+/*port assignment is weird in MSX and ZX mode WHY?*/
+BC1_MSX       = DATA_MSX_IN # REG_MSX_OUT;  		/* BC1=1 means register DATA input OR REG-selection output*/
+BDIR_MSX      = DATA_MSX_OUT # REG_MSX_OUT;   		/* BDIR=1 means register DATA output OR REG selection-output*/
+
+BC1_ZX       = REG_VAL_ZX_IN # REG_SEL_ZX_OUT;  		/*BC1=1 means DATA input OR register selection OUT/write*/
+BDIR_ZX      = REG_VAL_ZX_OUT # REG_SEL_ZX_OUT;   	/*BDIR=1 means DATA output: REG value output OR register selection OUT/write*/
+
+BC1=BC1_MSX $ BC1_ZX;
+BDIR=BDIR_MSX $ BDIR_ZX;
+AY_SWITCH=AY_MSX_SWITCH $ AY_ZX_SWITCH;
+
+/* SIO decoding */
+!SIO_CE=!decode_84h_87h;
+
+
