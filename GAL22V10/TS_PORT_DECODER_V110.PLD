@@ -75,7 +75,7 @@ REG_VAL_ZX_OUT   = ay3_zx_decode & !A1 & !A14 & IOWR; /*output on REG BFFDh port
 REG_VAL_ZX_IN   = ay3_zx_decode & !A1 &  A14 & IORD; /*input on DATA FFFDh port*/
 AY_ZX_SWITCH = ay3_zx_decode &  A1 &  A14 & IOWR; /*output on FFFFh port, PSG select, bit 0; depends on the value of register B being $FF*/
 
-/*port assignment is weird in MSX and ZX mode WHY?*/
+/*port assignment is different in MSX and ZX modes*/
 BC1_MSX       = DATA_MSX_IN # REG_MSX_OUT;  		/* BC1=1 means register DATA input OR REG-selection output*/
 BDIR_MSX      = DATA_MSX_OUT # REG_MSX_OUT;   		/* BDIR=1 means register DATA output OR REG selection-output*/
 
