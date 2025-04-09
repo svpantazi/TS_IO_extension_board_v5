@@ -37,8 +37,8 @@ PIN  18   =  !decode_feh;
 PIN  19   =  !SIO_CE; /* changed to SIO CE; */	
 
 /* CF card */	
-PIN  20   =  !CF_CS1; /* second CF card selection */
-PIN  21   =  !CF_CS0; /* first CF card selection */
+PIN  20   =  !CF_CS1; /* second set of 8 ports for CF card selection */
+PIN  21   =  !CF_CS0; /* first set of 8 ports for CF card selection */
 PIN  22   =  !CF_IORD;
 PIN  23   =  !CF_IOWR;
 
