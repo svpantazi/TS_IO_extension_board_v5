@@ -19,7 +19,7 @@ Aug, 2024
   - Some of the original AY-3 TurboSound designs call for decoding of data bus bits D0-D7 using an 8 input AND gate (7430) to achieve switching without any additional port decoding; however, since port decoding is easy present and done with GAL logic, the switching between AY3 chips done the usual way, through writing on a separate port to set/reset a flip-flop.
 
 ## Acknowledgements:
-  S. Cismas, Turbo Spectrum (CoBra-2); https://www.cobrasov.org
-  N. Muntean, Turbo Spectrum (CoBra-2), hardware development, testing and support
-  B. Shen, Simple80; CF card interface; https://www.retrobrewcomputers.org/doku.php?id=builderpages:plasmo:simple80r1
-  NedoPC, Velesoft and others; Turbo Sound; https://velesoft.speccy.cz/turbosound-cz.htm
+  - S. Cismas, Turbo Spectrum (CoBra-2); https://www.cobrasov.org  
+  - N. Muntean, Turbo Spectrum (CoBra-2), hardware development, testing and support
+  - B. Shen, Simple80; CF card interface; https://www.retrobrewcomputers.org/doku.php?id=builderpages:plasmo:simple80r1
+  - NedoPC, Velesoft and others; Turbo Sound; https://velesoft.speccy.cz/turbosound-cz.htm
